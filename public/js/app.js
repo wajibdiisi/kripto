@@ -2492,6 +2492,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2499,7 +2501,9 @@ __webpack_require__.r(__webpack_exports__);
       sender: '',
       receiver: '',
       amount: '',
-      email: ''
+      password: '',
+      message_title: '',
+      message: ''
     };
   },
   validations: {
@@ -2514,7 +2518,13 @@ __webpack_require__.r(__webpack_exports__);
     amount: {
       required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
     },
-    email: {
+    password: {
+      required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+    },
+    message_title: {
+      required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+    },
+    message: {
       required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
     }
   },
@@ -2529,7 +2539,7 @@ __webpack_require__.r(__webpack_exports__);
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
+        confirmButtonText: 'Yes, send it!',
         closeOnCancel: true
       }).then(function (result) {
         //send request to server 
@@ -2540,12 +2550,14 @@ __webpack_require__.r(__webpack_exports__);
             sender: _this.sender,
             receiver: _this.receiver,
             amount: _this.amount,
-            email: _this.email
+            password: _this.password,
+            message: _this.message,
+            message_title: _this.message_title
           }).then(function (response) {});
 
           _this.$swal({
-            title: 'Deleted!',
-            text: 'Your post has been deleted!',
+            title: 'Confirmed!',
+            text: 'Your money has been sent!',
             icon: 'success'
           });
 
@@ -2567,11 +2579,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-//
-//
-//
-//
-//
 //
 //
 //
@@ -46234,7 +46241,14 @@ var render = function() {
                     1
                   ),
                   _vm._v(" "),
-                  _vm._m(0, true)
+                  _c("div", { staticClass: "text-secondary-d1 text-120" }, [
+                    _c("span", { staticClass: "ml-n15 align-text-bottom" }, [
+                      _vm._v("$")
+                    ]),
+                    _c("span", { staticClass: "text-180" }, [
+                      _vm._v(_vm._s(transaction.amount))
+                    ])
+                  ])
                 ]),
                 _vm._v(" "),
                 _c(
@@ -46279,7 +46293,7 @@ var render = function() {
                   ]
                 ),
                 _vm._v(" "),
-                _vm._m(1, true)
+                _vm._m(0, true)
               ])
             ]
           )
@@ -46291,15 +46305,6 @@ var render = function() {
   )
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "text-secondary-d1 text-120" }, [
-      _c("span", { staticClass: "ml-n15 align-text-bottom" }, [_vm._v("$")]),
-      _c("span", { staticClass: "text-180" }, [_vm._v("10")])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -46440,26 +46445,98 @@ var render = function() {
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "form__item" }, [
-          _c("label", [_vm._v("Receiver Email")]),
+          _c("label", [_vm._v("Password")]),
           _c("input", {
             directives: [
               {
                 name: "model",
                 rawName: "v-model.trim",
-                value: _vm.$v.email.$model,
-                expression: "$v.email.$model",
+                value: _vm.$v.password.$model,
+                expression: "$v.password.$model",
                 modifiers: { trim: true }
               }
             ],
             staticClass: "amount",
-            attrs: { id: "email", value: "", type: "email", maxlength: "15" },
-            domProps: { value: _vm.$v.email.$model },
+            attrs: {
+              id: "password",
+              value: "",
+              type: "password",
+              maxlength: "25"
+            },
+            domProps: { value: _vm.$v.password.$model },
             on: {
               input: function($event) {
                 if ($event.target.composing) {
                   return
                 }
-                _vm.$set(_vm.$v.email, "$model", $event.target.value.trim())
+                _vm.$set(_vm.$v.password, "$model", $event.target.value.trim())
+              },
+              blur: function($event) {
+                return _vm.$forceUpdate()
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form__item" }, [
+          _c("label", [_vm._v("Message Title")]),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model.trim",
+                value: _vm.$v.message_title.$model,
+                expression: "$v.message_title.$model",
+                modifiers: { trim: true }
+              }
+            ],
+            staticClass: "amount",
+            attrs: {
+              id: "message_title",
+              value: "",
+              type: "text",
+              maxlength: "25"
+            },
+            domProps: { value: _vm.$v.message_title.$model },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(
+                  _vm.$v.message_title,
+                  "$model",
+                  $event.target.value.trim()
+                )
+              },
+              blur: function($event) {
+                return _vm.$forceUpdate()
+              }
+            }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form__item" }, [
+          _c("label", [_vm._v("Message")]),
+          _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model.trim",
+                value: _vm.$v.message.$model,
+                expression: "$v.message.$model",
+                modifiers: { trim: true }
+              }
+            ],
+            staticClass: "amount",
+            attrs: { id: "messsage", value: "", type: "text" },
+            domProps: { value: _vm.$v.message.$model },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.$set(_vm.$v.message, "$model", $event.target.value.trim())
               },
               blur: function($event) {
                 return _vm.$forceUpdate()
@@ -46532,8 +46609,6 @@ var render = function() {
       [
         _c("tr", [
           _c("td", [
-            _vm._v("\n        " + _vm._s(_vm.single_transaction) + "\n      "),
-            _vm._v(" "),
             _vm._m(0),
             _vm._v(" "),
             _c(
@@ -46687,7 +46762,68 @@ var render = function() {
                               )
                             ]),
                             _vm._v(" "),
-                            _vm._m(1),
+                            _c(
+                              "div",
+                              {
+                                staticClass: "divider",
+                                staticStyle: {
+                                  "margin-top": "30px",
+                                  "padding-top": "10px",
+                                  "border-top": "1px solid #CCC"
+                                }
+                              },
+                              [
+                                _c("div", { staticClass: "message" }, [
+                                  _c(
+                                    "h1",
+                                    {
+                                      staticClass: "emphasis",
+                                      staticStyle: {
+                                        margin: "0",
+                                        padding: "0",
+                                        "margin-bottom": "20px",
+                                        "font-weight": "700",
+                                        "margin-top": "10px",
+                                        "-webkit-font-smoothing": "antialiased",
+                                        "font-size": "28px",
+                                        "line-height": "130%",
+                                        "text-align": "left",
+                                        color: "#54bbff"
+                                      }
+                                    },
+                                    [
+                                      _vm._v(
+                                        _vm._s(
+                                          _vm.single_transaction.message_title
+                                        )
+                                      )
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "p",
+                                    {
+                                      staticStyle: {
+                                        color: "#434343",
+                                        "text-align": "left",
+                                        "line-height": "150%",
+                                        padding: "0",
+                                        "font-weight": "400",
+                                        "font-size": "18px"
+                                      }
+                                    },
+                                    [
+                                      _vm._v(
+                                        _vm._s(_vm.single_transaction.message) +
+                                          "\n                      "
+                                      )
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _c("br")
+                                ])
+                              ]
+                            ),
                             _vm._v(" "),
                             _c("div", { staticClass: "billing" }, [
                               _c(
@@ -46756,14 +46892,64 @@ var render = function() {
                                     ]
                                   ),
                                   _vm._v(" "),
-                                  _vm._m(2)
+                                  _vm._m(1)
                                 ]
                               ),
                               _vm._v(" "),
-                              _vm._m(3)
+                              _c(
+                                "div",
+                                {
+                                  staticClass: "divider",
+                                  staticStyle: {
+                                    "margin-top": "30px",
+                                    "padding-top": "10px",
+                                    "border-top": "1px solid #CCC"
+                                  }
+                                },
+                                [
+                                  _c("div", { staticClass: "grand-total" }, [
+                                    _c(
+                                      "strong",
+                                      {
+                                        staticStyle: {
+                                          color: "black",
+                                          display: "inline-block",
+                                          "font-size": "18px",
+                                          "margin-bottom": "5px",
+                                          "margin-top": "5px"
+                                        }
+                                      },
+                                      [_vm._v("Total")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "strong",
+                                      {
+                                        staticClass: "total",
+                                        staticStyle: {
+                                          "margin-top": "5px",
+                                          color: "black",
+                                          display: "inline-block",
+                                          "margin-bottom": "5px",
+                                          "font-size": "18px",
+                                          float: "right"
+                                        }
+                                      },
+                                      [
+                                        _vm._v(
+                                          "$" +
+                                            _vm._s(
+                                              _vm.single_transaction.amount
+                                            )
+                                        )
+                                      ]
+                                    )
+                                  ])
+                                ]
+                              )
                             ]),
                             _vm._v(" "),
-                            _vm._m(4)
+                            _vm._m(2)
                           ])
                         ]
                       )
@@ -46773,7 +46959,7 @@ var render = function() {
                   _c("td")
                 ]),
                 _vm._v(" "),
-                _vm._m(5)
+                _vm._m(3)
               ]
             )
           ])
@@ -46854,121 +47040,6 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c(
-      "div",
-      {
-        staticClass: "divider",
-        staticStyle: {
-          "margin-top": "30px",
-          "padding-top": "10px",
-          "border-top": "1px solid #CCC"
-        }
-      },
-      [
-        _c("div", { staticClass: "message" }, [
-          _c(
-            "h1",
-            {
-              staticClass: "emphasis",
-              staticStyle: {
-                margin: "0",
-                padding: "0",
-                "margin-bottom": "20px",
-                "font-weight": "700",
-                "margin-top": "10px",
-                "-webkit-font-smoothing": "antialiased",
-                "font-size": "28px",
-                "line-height": "130%",
-                "text-align": "left",
-                color: "#54bbff"
-              }
-            },
-            [_vm._v("Message Title")]
-          ),
-          _vm._v(" "),
-          _c(
-            "p",
-            {
-              staticStyle: {
-                color: "#434343",
-                "text-align": "left",
-                "line-height": "150%",
-                padding: "0",
-                "font-weight": "400",
-                "font-size": "18px"
-              }
-            },
-            [
-              _vm._v("The credit card ending in\n                      "),
-              _c("em", [_vm._v("XXXX")]),
-              _vm._v(
-                " has been successfully charged $XXX.XX. A copy of this receipt is also in your\n                      "
-              ),
-              _c(
-                "a",
-                {
-                  staticStyle: { color: "#54bbff" },
-                  attrs: { href: "#", target: "_blank" }
-                },
-                [_vm._v("Billing Statements")]
-              ),
-              _vm._v(".")
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "p",
-            {
-              staticStyle: {
-                color: "#434343",
-                "text-align": "left",
-                "line-height": "150%",
-                padding: "0",
-                "font-weight": "400",
-                "font-size": "18px"
-              }
-            },
-            [
-              _vm._v(
-                "If you have any questions, please let us know. We'll get back to you as soon as we can."
-              )
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "p",
-            {
-              staticStyle: {
-                color: "#434343",
-                "text-align": "left",
-                "line-height": "150%",
-                padding: "0",
-                "font-weight": "400",
-                "font-size": "18px"
-              }
-            },
-            [
-              _vm._v("Your friends,\n                      "),
-              _c("br"),
-              _vm._v(" "),
-              _c(
-                "a",
-                {
-                  staticStyle: { color: "#54bbff" },
-                  attrs: { href: "mailto:billing@wistia.com" }
-                },
-                [_vm._v("billing@wistia.com")]
-              )
-            ]
-          )
-        ])
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
       "ul",
       {
         staticStyle: {
@@ -47013,55 +47084,6 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      {
-        staticClass: "divider",
-        staticStyle: {
-          "margin-top": "30px",
-          "padding-top": "10px",
-          "border-top": "1px solid #CCC"
-        }
-      },
-      [
-        _c("div", { staticClass: "grand-total" }, [
-          _c(
-            "strong",
-            {
-              staticStyle: {
-                color: "black",
-                display: "inline-block",
-                "font-size": "18px",
-                "margin-bottom": "5px",
-                "margin-top": "5px"
-              }
-            },
-            [_vm._v("Total")]
-          ),
-          _vm._v(" "),
-          _c(
-            "strong",
-            {
-              staticClass: "total",
-              staticStyle: {
-                "margin-top": "5px",
-                color: "black",
-                display: "inline-block",
-                "margin-bottom": "5px",
-                "font-size": "18px",
-                float: "right"
-              }
-            },
-            [_vm._v("$XXX")]
-          )
-        ])
-      ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "foot" }, [
       _c(
         "p",
@@ -47076,9 +47098,9 @@ var staticRenderFns = [
           }
         },
         [
-          _c("strong", [_vm._v("You are all set.")]),
+          _c("strong", [_vm._v("This transaction has been encrypted.")]),
           _vm._v(
-            " Your card has been charged, and no further action is required on your part."
+            " Please enter the key below provided by the sender if you want to see the detail of this transaction"
           )
         ]
       )

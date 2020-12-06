@@ -3,7 +3,6 @@
     <div> <table class="wrapper" bgcolor="#ECEEF1" style="background-color:#ECEEF1;width:100%;">
     <tr>
       <td>
-          {{single_transaction}}
         <!-- HEADER -->
         <table class="head-wrap" style="margin: 0 auto;">
           <tr>
@@ -48,16 +47,12 @@
                   <div class="divider" style="margin-top:30px;padding-top:10px;border-top:1px solid #CCC">
                     <div class="message">
 
-                      <h1 class="emphasis" style="margin:0;padding:0;margin-bottom:20px;font-weight:700;margin-top:10px;-webkit-font-smoothing:antialiased;font-size:28px;line-height:130%;text-align:left;color:#54bbff">Message Title</h1>
+                      <h1 class="emphasis" style="margin:0;padding:0;margin-bottom:20px;font-weight:700;margin-top:10px;-webkit-font-smoothing:antialiased;font-size:28px;line-height:130%;text-align:left;color:#54bbff">{{single_transaction.message_title}}</h1>
 
-                      <p style="color:#434343;text-align:left;line-height:150%;padding:0;font-weight:400;font-size:18px">The credit card ending in
-                        <em>XXXX</em> has been successfully charged $XXX.XX. A copy of this receipt is also in your
-                        <a href="#" target="_blank" style="color:#54bbff">Billing Statements</a>.</p>
-                      <p style="color:#434343;text-align:left;line-height:150%;padding:0;font-weight:400;font-size:18px">If you have any questions, please let us know. We'll get back to you as soon as we can.</p>
-                      <p style="color:#434343;text-align:left;line-height:150%;padding:0;font-weight:400;font-size:18px">Your friends,
+                      <p style="color:#434343;text-align:left;line-height:150%;padding:0;font-weight:400;font-size:18px">{{single_transaction.message}}
+                        </p>
                         <br>
-                        <a href="mailto:billing@wistia.com" style="color:#54bbff">billing@wistia.com</a>
-                      </p>
+                     
                     </div>
                   </div>
                   <div class="billing">
@@ -74,13 +69,13 @@
                       <div class="grand-total">
                         <strong style="color:black;display:inline-block;font-size:18px;margin-bottom:5px;margin-top:5px">Total</strong>
 
-                        <strong class="total" style="margin-top:5px;color:black;display:inline-block;margin-bottom:5px;font-size:18px;float:right">$XXX</strong>
+                        <strong class="total" style="margin-top:5px;color:black;display:inline-block;margin-bottom:5px;font-size:18px;float:right">${{single_transaction.amount}}</strong>
                       </div>
                     </div>
                   </div>
                   <div class="foot">
                     <p style="color:#434343;text-align:left;line-height:150%;padding:0;font-weight:400;font-size:18px">
-                      <strong>You are all set.</strong> Your card has been charged, and no further action is required on your part.</p>
+                      <strong>This transaction has been encrypted.</strong> Please enter the key below provided by the sender if you want to see the detail of this transaction</p>
                   </div>
                 </div>
               </div>

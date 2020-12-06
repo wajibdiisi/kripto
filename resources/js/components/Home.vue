@@ -163,7 +163,7 @@
                         </h4>
 
                         <div class="text-secondary-d1 text-120">
-                            <span class="ml-n15 align-text-bottom">$</span><span class="text-180">10</span>
+                            <span class="ml-n15 align-text-bottom">$</span><span class="text-180">{{transaction.amount}}</span>
                         </div>
                     </div>
 

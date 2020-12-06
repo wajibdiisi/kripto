@@ -313,7 +313,9 @@
             <div class="form__item"><label>From</label><input  placeholder="Sender Email" class="amount" id="sender" v-model.trim="$v.sender.$model" value="" type="text" maxlength="15"/></div>
             <div class="form__item"><label>To</label><input id="receiver" v-model.trim="$v.receiver.$model" placeholder="Receiver" /></div>
             <div class="form__item"><label>Amount ($)</label><input class="amount" id="amount" v-model.trim="$v.amount.$model" value="" type="number"  min="0"/></div>
-            <div class="form__item"><label>Receiver Email</label><input class="amount" id="email" v-model.trim="$v.email.$model" value="" type="email" maxlength="15" /></div>
+            <div class="form__item"><label>Password</label><input class="amount" id="password" v-model.trim="$v.password.$model" value="" type="password" maxlength="25" /></div>
+            <div class="form__item"><label>Message Title</label><input class="amount" id="message_title" v-model.trim="$v.message_title.$model" value="" type="text" maxlength="25" /></div>
+            <div class="form__item"><label>Message</label><input class="amount" id="messsage" v-model.trim="$v.message.$model" value="" type="text"/></div>
             <div class="form__item type">
                 <div class="tag">TRANSFER</div>
             </div>
@@ -331,7 +333,9 @@ export default {
             sender : '',
             receiver : '',
             amount : '',
-            email : '',
+            password : '',
+            message_title : '',
+            message : ''
         }
     },
     validations: {
@@ -346,9 +350,15 @@ export default {
             amount : {
                 required,
             },
-            email : {
+            password : {
                 required
             },
+            message_title : {
+                required
+            },
+            message : {
+                required
+            }
         },
     methods : {
         send_money(){
@@ -359,7 +369,7 @@ export default {
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
+            confirmButtonText: 'Yes, send it!',
             closeOnCancel: true
             }).then((result) => {
                 
@@ -370,13 +380,15 @@ export default {
                          sender : this.sender,
                          receiver : this.receiver,
                          amount : this.amount,
-                         email : this.email
+                         password : this.password,
+                         message : this.message,
+                         message_title : this.message_title
                      }).then((response) =>{
                     });
                     this.$swal({
                    
-                    title : 'Deleted!',
-                    text : 'Your post has been deleted!',
+                    title : 'Confirmed!',
+                    text : 'Your money has been sent!',
                     icon : 'success',
                     },
                     ); 

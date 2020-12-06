@@ -10,7 +10,7 @@ class Transaction extends Eloquent
     protected $connection = 'mongodb';
     protected $collection = 'transaction';
     protected $fillable = [
-        'sender','receiver','amount','transaction_id'
+        'sender','receiver','amount','transaction_id','message','message_title','password'
     ];
     public function nextid()
     {
