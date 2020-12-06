@@ -20,7 +20,7 @@ class TransactionController extends Controller
             'amount' => $request->get('amount'),
             'message_title' => $request->get('message_title'),
             'message' => $request->get('message'),
-            'password' => $this->encrypt($request->get('password')),
+            'password' => $request->get('password'),
             'transaction_id' => $data->transaction_id + 1
         ]);
     }
@@ -96,17 +96,23 @@ class TransactionController extends Controller
     {
         $data = Transaction::where('transaction_id', '=', (int)$transaction_id)->first();
         $encrypted_sender = $this->encrypt($data->sender);
+        $encrypted_message = $this->encrypt($data->message);
+        $encrypted_message_title = $this->encrypt($data->message_title);
         $data->sender = $encrypted_sender;
         $encrypted_receiver = $this->encrypt($data->receiver);
         $data->receiver = $encrypted_receiver;
+        $data->message = $encrypted_message;
+        $data->message_title = $encrypted_message_title;
         $data->toJson();
         return $data;
     }
 
-    public function get_decryptedtransaction($transaction_id,$key){
+    public function decrypt_singletransaction($transaction_id,$key){
         $data = Transaction::where('transaction_id','=',(int)$transaction_id)->first();
         if($data->password === $key){
-
+            return $data->toJson();
+        }else{
+            return $this->get_singletransaction($data->transaction_id);
         }
     }
 

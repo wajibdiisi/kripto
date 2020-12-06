@@ -1,3 +1,31 @@
+<style scoped>
+ .form__item {
+	 position: relative;
+	 display: flex;
+	 flex-direction: column;
+}
+ .form__item.cta {
+	 flex-direction: row;
+	 justify-content: flex-end;
+}
+ .form__item label {
+	 display: block;
+	 font-size: 0.85rem;
+	 padding: 0 0 0.5rem;
+	 text-transform: uppercase;
+	 color: #44c897;
+}
+ .form__item input {
+	 border: 0;
+	 padding: 1em;
+	 width: 100%;
+	 border-radius: 4px;
+	 background-color: #ebf9f1;
+	 box-sizing: border-box;
+	 outline: none;
+}
+</style>
+
 
 <template>
     <div> <table class="wrapper" bgcolor="#ECEEF1" style="background-color:#ECEEF1;width:100%;">
@@ -76,6 +104,8 @@
                   <div class="foot">
                     <p style="color:#434343;text-align:left;line-height:150%;padding:0;font-weight:400;font-size:18px">
                       <strong>This transaction has been encrypted.</strong> Please enter the key below provided by the sender if you want to see the detail of this transaction</p>
+                      <div class="form__item"><label>Password</label><input class="amount" id="password" v-model.trim="$v.password.$model" value="" type="password"/></div>
+                      <button class="btn btn-success mt-2" @click.prevent="decryptData(password)">Submit</button>
                   </div>
                 </div>
               </div>
@@ -95,14 +125,21 @@
 </template>
 
 <script>
+import { required, minLength, maxLength, between } from 'vuelidate/lib/validators'
 export default {
     data(){
         return {
-            single_transaction: []
+            single_transaction: [],
+            password : ''
         };
     },
     created(){
         this.loadData();
+    },
+    validations: {
+        password : {
+            required
+        }
     },
     methods : {
     loadData(){
@@ -110,6 +147,13 @@ export default {
         this.$http.get(uri).then((response) => {
             this.single_transaction = response.data;
         })
+    },
+    decryptData($id){
+        let uri = "/api/decrypt_singletransaction/" + this.$route.params.transaction_id + "/" + $id;
+        this.$http.get(uri).then((response) => {
+            this.single_transaction = response.data;
+            }
+        )
     }
 
 }}
