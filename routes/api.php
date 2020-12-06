@@ -18,6 +18,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('get_alltransaction',[App\Http\Controllers\TransactionController::class,'get_transaction']);
-Route::get('/get_singletransaction/{transaction_id}',[App\Http\Controllers\TransactionController::class,'get_singletransaction']);
+Route::get('get_singletransaction/{transaction_id}',[App\Http\Controllers\TransactionController::class,'get_singletransaction']);
 Route::post('transaction/create',[App\Http\Controllers\TransactionController::class,'create_transaction']);
 
