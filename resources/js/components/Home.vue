@@ -144,6 +144,9 @@
         text-decoration: line-through;
         ;
     }
+    a{
+        text-decoration : none;
+    }
 
 </style>
 
@@ -176,10 +179,16 @@
                             </span>
                         </li>
 
-                        <li class="mt-25">
+                        <li>
                             <i class="fa fa-check text-success-m2 text-110 mr-2 mt-1"></i>
                             <span class="text-110">
                                 Receiver Name : {{transaction.receiver}}
+                            </span>
+                        </li>
+                        <li>
+                            <i class="fa fa-check text-success-m2 text-110 mr-2 mt-1"></i>
+                            <span class="text-110">
+                                Transaction Date : {{transaction.created_at | formatDate }}
                             </span>
                         </li>
 
@@ -187,8 +196,9 @@
                     </ul>
 
                     <div class="col-12 col-md-4 text-center">
+                        <router-link :to="{ name : 'transactionDetail' , params: {transaction_id : transaction.transaction_id } }">
                         <a href="#" class="f-n-hover btn btn-info btn-raised px-4 py-25 w-75 text-600">Money
-                            Successfully Sent</a>
+                       Sent</a></router-link>
                     </div>
                 </div>
 

@@ -9,6 +9,7 @@ import VueAxios from 'vue-axios';
 import VueSwal from 'vue-sweetalert2';
 import Axios from 'axios';
 import Vuelidate from 'vuelidate';
+import moment from 'moment';
 
 Vue.use(VueRouter,VueAxios,Axios);
 Vue.use(Vuelidate);
@@ -23,6 +24,11 @@ import { create } from 'lodash';
 
 Vue.prototype.$http = Axios;
 Vue.prototype.$user = window.User;
+Vue.filter('formatDate', function(value) {
+    if (value) {
+      return moment(String(value)).format('MM/DD/YYYY hh:mm')
+    }
+  })
 
 
 // membuat router

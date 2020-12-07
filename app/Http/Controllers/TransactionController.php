@@ -112,7 +112,7 @@ class TransactionController extends Controller
         if($data->password === $key){
             return $data->toJson();
         }else{
-            return $this->get_singletransaction($data->transaction_id);
+            return 'error';
         }
     }
 
