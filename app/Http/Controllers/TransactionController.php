@@ -15,200 +15,357 @@ class TransactionController extends Controller
 
         $data = Transaction::latest()->first();
         return Transaction::create([
-            'sender' => $request->get('sender'),
-            'receiver' => $request->get('receiver'),
+            'sender' => $this->encrypt_zigzag($this->encrypt_vigenere($request->get('sender'))),
+            'receiver' => $this->encrypt_zigzag($this->encrypt_vigenere($request->get('receiver'))),
             'amount' => $request->get('amount'),
-            'message_title' => $request->get('message_title'),
-            'message' => $request->get('message'),
-            'password' => $request->get('password'),
+            'message_title' => $this->encrypt_zigzag($this->encrypt_vigenere($request->get('message_title'))),
+            'message' => $this->encrypt_zigzag($this->encrypt_vigenere($request->get('message'))),
+            'password' => $this->encrypt_zigzag($this->encrypt_vigenere($request->get('password'))),
             'transaction_id' => $data->transaction_id + 1
         ]);
     }
 
-    public function encrypt($data)
-    {
-        // change key to lowercase for simplicity
-        $key = "ALIG";
-        $key = strtolower($key);
-
-        // intialize variables
-        //$vigenere_data = "";
-        $ki = 0;
-        $kl = strlen($key);
-        $length = strlen($data);
-
-        // iterate over each line in encrypted_data
-        for ($i = 0; $i < $length; $i++) {
-            // if the letter is alpha, encrypt it
-            if (ctype_alpha($data[$i])) {
-                // uppercase
-                if (ctype_upper($data[$i])) {
-                    $data[$i] = chr(((ord($data[$ki]) - ord("a") + ord($data[$i]) - ord("A")) % 26) + ord("A"));
-                }
-
-                // lowercase
-                else {
-                    $data[$i] = chr(((ord($data[$ki]) - ord("a") + ord($data[$i]) - ord("a")) % 26) + ord("a"));
-                }
-
-                // update the index of key
-                $ki++;
-                if ($ki >= $kl) {
-                    $ki = 0;
-                }
-            }
-        }
-
-        // return the encrypted code
-        return $data;
-
-        $rails = 3;
-        $encrypted_data = [];
-        $position = ($rails * 2) - 2;
-        for ($index = 0; $index < strlen($data); $index++) {
-            for ($step = 0; $step < $rails; $step++) {
-                if (!isset($encrypted_data[$step])) {
-                    $encrypted_data[$step] = '';
-                }
-                if ($index % $position == $step || $index % $position == $position - $step) {
-                    $encrypted_data[$step] .= $data[$index];
-                } else {
-                    $encrypted_data[$step] .= ".";
-                }
-            }
-        }
-        return implode('', str_replace('.', '', $encrypted_data));
-    }
+    
 
     public function get_transaction()
     {
         $datas = Transaction::orderBy('transaction_id', 'desc')->get();
-        foreach ($datas as $data) {
-            $encrypted_sender = $this->encrypt($data->sender);
-            $data->sender = $encrypted_sender;
-            $encrypted_receiver = $this->encrypt($data->receiver);
-            $data->receiver = $encrypted_receiver;
-        }
         return $datas->toJson();
     }
 
     public function get_singletransaction($transaction_id)
     {
-        $data = Transaction::where('transaction_id', '=', (int)$transaction_id)->first();
-        $encrypted_sender = $this->encrypt($data->sender);
-        $encrypted_message = $this->encrypt($data->message);
-        $encrypted_message_title = $this->encrypt($data->message_title);
-        $data->sender = $encrypted_sender;
-        $encrypted_receiver = $this->encrypt($data->receiver);
-        $data->receiver = $encrypted_receiver;
-        $data->message = $encrypted_message;
-        $data->message_title = $encrypted_message_title;
+        $data = Transaction::where('transaction_id', '=', (int)$transaction_id)->first();   
         $data->toJson();
         return $data;
     }
-
     public function decrypt_singletransaction($transaction_id,$key){
         $data = Transaction::where('transaction_id','=',(int)$transaction_id)->first();
-        if($data->password === $key){
+        if($this->decrypt_vigenere($this->decrypt_zigzag($data->password)) === $key){
+            $decrypted_sender = $this->decrypt_vigenere($this->decrypt_zigzag($data->sender));
+            $decrypted_message = $this->decrypt_vigenere($this->decrypt_zigzag($data->message));
+            $decrypted_message_title = $this->decrypt_vigenere($this->decrypt_zigzag($data->message_title));
+            $decrypted_receiver = $this->decrypt_vigenere($this->decrypt_zigzag($data->receiver));
+            $data->sender = $decrypted_sender;
+            $data->message = $decrypted_message;
+            $data->message_title = $decrypted_message_title;
+            $data->receiver = $decrypted_receiver;
             return $data->toJson();
         }else{
             return 'error';
         }
     }
 
-    public function decrypt($ecnrypted_data)
+    public function encrypt_vigenere($data)
     {
-        //Dekripsi Zigzag
-        $rails = 3;
-        $position = ($rails * 2) - 2;
-        $textLength = strlen($ecnrypted_data);
+        static $alphabet = array(
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+            'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+            'u', 'v', 'w', 'x', 'y', 'z'
+        );
 
-        $minLength = floor($textLength / $position);
-        $balance = $textLength % $position;
-        $lengths = [];
-        $strings = [];
-        $totalLengths = 0;
-        //find no of characters in each row
-        for ($rowIndex = 0; $rowIndex < $rails; $rowIndex++) {
-            $lengths[$rowIndex] = $minLength;
-            if ($rowIndex != 0 && $rowIndex != ($rails - 1)) {
-                $lengths[$rowIndex] += $minLength;
-            }
-            if ($balance > $rowIndex) {
-                $lengths[$rowIndex]++;
-            }
-            if ($balance > ($rails + ($rails - $rowIndex) - 2)) {
-                $lengths[$rowIndex]++;
-            }
-            $strings[] = substr($ecnrypted_data, $totalLengths, $lengths[$rowIndex]);
-            $totalLengths += $lengths[$rowIndex];
-        }
-
-        //convert row of characters to plain message
-        $data = '';
-        while (strlen($data) < $textLength) {
-            for ($charIndex = 0; $charIndex < $position; $charIndex++) {
-                if (isset($strings[$charIndex])) {
-                    $index = $charIndex;
-                } else {
-                    $index = $position - $charIndex;
-                }
-                $data .= substr($strings[$index], 0, 1);
-                $strings[$index] = substr($strings[$index], 1);
-            }
-        }
-        return $data;
-
-        //Dekripsi Vigenere
-        // change key to lowercase for simplicity
         $key = "ALIG";
-        $key = strtolower($key);
+        // Output variable defined as empty.
+        $output = '';
+        // Encrypted variable defined as empty.
+        $encrypted = '';
+        // The length of the original message.
+        $dataSize = strlen($data);
+        // The length of the key.
+        $keySize = strlen($key);
 
-        // intialize variables
-        $decrypted_data = "";
-        $ki = 0;
-        $kl = strlen($key);
-        $length = strlen($data);
+        // Detecting if the message contains 
+        // a non-aplhabetic characters.
+        if (preg_match('/[a-z0-9\W\s_]/', $data)) {
+            // Replacing those non-alphabetic characters with '', and converting the message
+            // to the lowercase letter.
+            $editedMessage = strtolower(preg_replace("/[0-9\W\s_]/", '', $data));
 
-        // iterate over each line in text
-        for ($i = 0; $i < $length; $i++) {
-            // if the letter is alpha, decrypt it
-            if (ctype_alpha($data[$i])) {
-                // uppercase
-                if (ctype_upper($data[$i])) {
-                    $x = (ord($data[$i]) - ord("A")) - (ord($key[$ki]) - ord("a"));
+            // The length of the edited message.
+            $dataSize = strlen($editedMessage);
 
-                    if ($x < 0) {
-                        $x += 26;
+            // Looping to do the encipher based on how long of the message is.
+            for ($i = 0; $i < $dataSize; $i++) {
+                // If the value of $i is equal to the length of the key or greater, 
+                // then the key will be reset to the beginning.
+                if ($i == $keySize || $i > $keySize) {
+                    // This variable will contain the shifting index for the key.
+                    $a = $i % $keySize;
+
+                    // $x is the vigenère cipher calculation.
+                    // the "array_search()" is a process to get
+                    // the alphabet number.
+                    $x = (int)array_search($editedMessage[$i], $alphabet) + array_search(strtolower($key[$a]), $alphabet);
+                    // The length of the alphabet which is 26.
+                    $y = 26;
+
+                    // The final process of the calculation.
+                    $c = fmod($x, $y);
+
+                    // If the result from modulo is smaller than 0, then $c will be 
+                    // added with $y where $y is an absolute (positive) value.
+                    if ($c < 0) {
+                        $c += abs($y);
                     }
+                } else {
+                    // $x is the vigenère cipher calculation.
+                    // the "array_search()" is a process to get
+                    // the alphabet number.
+                    $x = (int)array_search($editedMessage[$i], $alphabet) + array_search(strtolower($key[$i]), $alphabet);
+                    // The length of the alphabet which is 26.
+                    $y = 26;
 
-                    $x = $x + ord("A");
+                    // The final process of the calculation.
+                    $c = fmod($x, $y);
 
-                    $text[$i] = chr($x);
+                    // If the result from modulo is smaller than 0, then $c will be 
+                    // added with $y where $y is an absolute (positive) value.
+                    if ($c < 0) {
+                        $c += abs($y);
+                    }
                 }
 
-                // lowercase
-                else {
-                    $x = (ord($data[$i]) - ord("a")) - (ord($key[$ki]) - ord("a"));
-
-                    if ($x < 0) {
-                        $x += 26;
-                    }
-
-                    $x = $x + ord("a");
-
-                    $text[$i] = chr($x);
-                }
-
-                // update the index of key
-                $ki++;
-                if ($ki >= $kl) {
-                    $ki = 0;
+                // Checking if the value is exist on the alphabet lookup.
+                if (isset($alphabet[$c])) {
+                    $encrypted .= $alphabet[$c];
                 }
             }
         }
 
-        // return the decrypted text
-        return $decrypted_data;
+        // Counter for the position of the encrypted message.
+        $k = 0;
+
+        // This loop has a purpose to reconstruct the encrypted message based on
+        // the length of the original messsage itself.
+        for ($j = 0; $j < strlen($data); $j++) {
+            // If the message on index $j is an alphabetic, then it will return
+            // the encrypted message on position $k.
+            if (ctype_alpha($data[$j])) {
+                // If the letter on message index $j is an uppercase letter,
+                // then the output will be converted from lowercase to uppercase.
+                if (ctype_upper($data[$j])) {
+                    // Appending the output.
+                    $output .= strtoupper($encrypted[$k]);
+
+                    // Adding the position counter.
+                    $k += 1;
+                }
+                // Else, just append the encrypted message to the output.
+                else {
+                    // Appending the output.
+                    $output .= $encrypted[$k];
+
+                    // Adding the position counter.
+                    $k += 1;
+                }
+            }
+            // Otherwise, it will return the original message on index $j.
+            else {
+                // Appending the output.
+                $output .= $data[($j)];
+            }
+        }
+
+        // return $output;
+        return $output;
     }
+
+    public function codeMessage($text, $rails)
+    {
+        $codedMessage = array();
+
+        $a = 0;
+        $direction = "forwards";
+
+        for ($i = 0; $i < strlen($text); $i++) {
+
+            $currentletter = $text[$i];
+
+            if (!isset($codedMessage[$a])) {
+                $codedMessage[$a] = "";
+            }
+            $codedMessage[$a] .= $currentletter;
+
+            if ($a == 0) {
+                $a++;
+                $direction = "forwards";
+            } elseif ($a == $rails - 1) {
+                $a--;
+                $direction = "backwards";
+            } elseif ($direction == "forwards") {
+                $a++;
+            } elseif ($direction == "backwards") {
+                $a--;
+            }
+        }
+        return $codedMessage;
+    }
+
+    public function encrypt_zigzag($text)
+    {
+        $rails = 3;
+        $codedMessage = $this->codeMessage($text, $rails);
+
+        $finalMessage = "";
+
+        foreach ($codedMessage as $chunks) {
+            $finalMessage .= $chunks;
+        }
+        return $finalMessage;
+    }
+    public function decrypt_vigenere($data)
+    {
+        //Dekripsi Vigenere
+        static $alphabet = array(
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+            'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+            'u', 'v', 'w', 'x', 'y', 'z'
+        );
+
+        $key = "ALIG";
+        // Output variable defined as empty.
+        $output = '';
+        // Decrypted variable defined as empty.
+        $decrypted = '';
+        // The length of the original message.
+        $dataSize = strlen($data);
+        // The length of the key.
+        $keySize = strlen($key);
+
+        // Detecting if the message contains 
+        // a non-aplhabetic characters.
+        if (preg_match('/[a-z0-9\W\s_]/', $data)) {
+            // Replacing those non-alphabetic characters with '', and converting the message
+            // to the lowercase letter.
+            $editedMessage = strtolower(preg_replace("/[0-9\W\s_]/", '', $data));
+
+            // The length of the edited message.
+            $dataSize = strlen($editedMessage);
+
+            // Looping to do the decipher based on how long of the message is.
+            for ($i = 0; $i < $dataSize; $i++) {
+                // If the value of $i is equal to the length of the key or greater, 
+                // then the key will be reset to the beginning.
+                if ($i == $keySize || $i > $keySize) {
+                    // This variable will contain the shifting index for the key.
+                    $a = $i % $keySize;
+
+                    // $x is the vigenère cipher calculation.
+                    // the "array_search()" is a process to get
+                    // the alphabet number.
+                    $x = (int)array_search($editedMessage[$i], $alphabet) - array_search(strtolower($key[$a]), $alphabet);
+                    // The length of the alphabet which is 26.
+                    $y = 26;
+
+                    // The final process of the calculation.
+                    $c = fmod($x, $y);
+
+                    // If the result from modulo is smaller than 0, then $c will be 
+                    // added with $y where $y is an absolute (positive) value.
+                    if ($c < 0) {
+                        $c += abs($y);
+                    }
+                } else {
+                    // $x is the vigenère cipher calculation.
+                    // the "array_search()" is a process to get
+                    // the alphabet number.
+                    $x = (int)array_search($editedMessage[$i], $alphabet) - array_search(strtolower($key[$i]), $alphabet);
+                    // The length of the alphabet which is 26.
+                    $y = 26;
+
+                    // The final process of the calculation.
+                    $c = fmod($x, $y);
+
+                    // If the result from modulo is smaller than 0, then $c will be 
+                    // added with $y where $y is an absolute (positive) value.
+                    if ($c < 0) {
+                        $c += abs($y);
+                    }
+                }
+
+                // Checking if the value is exist on the alphabet lookup.
+                if (isset($alphabet[$c])) {
+                    $decrypted .= $alphabet[$c];
+                }
+            }
+        }
+
+        // Counter for the position of the decrypted message.
+        $k = 0;
+
+        // This loop has a purpose to reconstruct the decrypted message based on
+        // the length of the original messsage itself.
+        for ($j = 0; $j < strlen($data); $j++) {
+            // If the message on index $j is an alphabetic, then it will return
+            // the decrypted message on position $k.
+            if (ctype_alpha($data[$j])) {
+                // If the letter on message index $j is an uppercase letter,
+                // then the output will be converted from lowercase to uppercase.
+                if (ctype_upper($data[$j])) {
+                    // Appending the output.
+                    $output .= strtoupper($decrypted[$k]);
+
+                    // Adding the position counter.
+                    $k += 1;
+                }
+                // Else, just append the decrypted message to the output.
+                else {
+                    // Appending the output.
+                    $output .= $decrypted[$k];
+
+                    // Adding the position counter.
+                    $k += 1;
+                }
+            }
+            // Otherwise, it will return the original message on index $j.
+            else {
+                // Appending the output.
+                $output .= $data[($j)];
+            }
+        }
+
+        // return $output;
+        return $output;
+    }
+
+    public function decrypt_zigzag($text)
+    {
+        $rails = 3;
+        $lengths = $this->codeMessage($text, $rails);
+
+        $reversedArray = array();
+
+        $message = $text;
+        for ($i = 0; $i < count($lengths); $i++) {
+            $length = strlen($lengths[$i]);
+
+            $reversedArray[] = substr($message, 0, $length);
+            $message = substr($message, $length);
+        }
+
+        $decodedMessage = "";
+
+        $k = 0;
+        $direction = "forwards";
+        for ($i = 0; $i < strlen($text); $i++) {
+            $currentLetter = $reversedArray[$k][0];
+            $decodedMessage .= $currentLetter;
+            $reversedArray[$k] = substr($reversedArray[$k], 1);
+
+            if ($k == 0) {
+                $k++;
+                $direction = "forwards";
+            } elseif ($k == $rails - 1) {
+                $k--;
+                $direction = "backwards";
+            } elseif ($direction == "forwards") {
+                $k++;
+            } elseif ($direction == "backwards") {
+                $k--;
+            }
+        }
+
+        return $decodedMessage;
+    }
+
 }
